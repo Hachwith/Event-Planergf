@@ -1,0 +1,137 @@
+
+
+<!-- Event Planner Website -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Planner</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .event-list {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .event-item {
+            background: #fff;
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 5px solid #28a745;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+            border-left-color: gray;
+        }
+        .btn {
+            padding: 5px 10px;
+            margin-left: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .complete-btn {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body onload="loadEvents()">
+    <div class="container">
+        <h2>Event Planner</h2>
+        <input type="text" id="eventName" placeholder="Event Name">
+        <input type="date" id="eventDate">
+        <button onclick="addEvent()">Add Event</button>
+        <div class="event-list" id="eventList"></div>
+    </div>
+    <script>
+        function addEvent() {
+            let name = document.getElementById("eventName").value;
+            let date = document.getElementById("eventDate").value;
+            if (name && date) {
+                let events = JSON.parse(localStorage.getItem("events")) || [];
+                events.push({ name, date, completed: false });
+                localStorage.setItem("events", JSON.stringify(events));
+                displayEvents();
+                document.getElementById("eventName").value = "";
+                document.getElementById("eventDate").value = "";
+            } else {
+                alert("Please enter both event name and date.");
+            }
+        }
+
+        function displayEvents() {
+            let eventList = document.getElementById("eventList");
+            eventList.innerHTML = "";
+            let events = JSON.parse(localStorage.getItem("events")) || [];
+            events.forEach((event, index) => {
+                let eventItem = document.createElement("div");
+                eventItem.classList.add("event-item");
+                if (event.completed) {
+                    eventItem.classList.add("completed");
+                }
+                eventItem.innerHTML = `
+                    <span>${event.name} <br> ${event.date}</span>
+                    <div>
+                        <button class="btn complete-btn" onclick="markCompleted(${index})">✓</button>
+                        <button class="btn delete-btn" onclick="deleteEvent(${index})">✗</button>
+                    </div>
+                `;
+                eventList.appendChild(eventItem);
+            });
+        }
+
+        function markCompleted(index) {
+            let events = JSON.parse(localStorage.getItem("events"));
+            events[index].completed = !events[index].completed;
+            localStorage.setItem("events", JSON.stringify(events));
+            displayEvents();
+        }
+
+        function deleteEvent(index) {
+            let events = JSON.parse(localStorage.getItem("events"));
+            events.splice(index, 1);
+            localStorage.setItem("events", JSON.stringify(events));
+            displayEvents();
+        }
+
+        function loadEvents() {
+            displayEvents();
+        }
+    </script>
+</body>
+</html>
